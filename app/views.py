@@ -1,10 +1,10 @@
-from django.shortcuts import render, HttpResponse, redirect
+from django.shortcuts import render, redirect
 from django.contrib import messages
 import bcrypt
 from .models import Lender, Borrower, Loan
 
 def index(request):
-    return HttpResponse("Hello Online Lending")
+    return redirect("/login")
 
 def register(request):
     return render(request, "register.html")
@@ -63,6 +63,7 @@ def login(request):
         return redirect("/{}/{}".format(request.session['type'], request.session['userId']))
 
     elif request.method == 'POST':
+        user = None
         lender = Lender.objects.filter(email=request.POST['email'])
         if lender:
             request.session['type'] = 'lender'
