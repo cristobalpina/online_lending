@@ -29,7 +29,7 @@ def create_borrower(request):
 
 def borrower_profile(request, id):
     if id != request.session["userId"]:
-        return redirect(f"/{request.session['type']}/{request.session['userId']}")
+        return redirect("/{}/{}".format(request.session['type'], request.session['userId']))
     borrower = Borrower.objects.get(id=id)
     context = {
         "borrower": borrower,
@@ -51,16 +51,18 @@ def lend(request):
     amount = int(request.POST["amount"])
     if lender.account_balance - amount < 0:
         messages.error(request, "Insufficient funds")
-        return redirect(f"/{request.session['type']}/{request.session['userId']}")
+        return redirect("/{}/{}".format(request.session['type'], request.session['userId']))
     Loan.objects.create(borrower=borrower, lender=lender, amount=amount)
-    return redirect(f"/{request.session['type']}/{request.session['userId']}")
+    return redirect("/{}/{}".format(request.session['type'], request.session['userId']))
 
 # Auth
 def login(request):
     if request.method == 'GET':
-        if request.session['userId']:
-            return redirect(f"/{request.session['type']}/{request.session['userId']}")
-        return render(request, "login.html")
+        try:
+            request.session['userId']
+        except:
+            return render(request, "login.html")
+        return redirect("/{}/{}".format(request.session['type'], request.session['userId']))
 
     elif request.method == 'POST':
         lender = Lender.objects.filter(email=request.POST['email'])
@@ -75,7 +77,7 @@ def login(request):
         if user:
             if bcrypt.checkpw(request.POST['password'].encode(), user.password.encode()):
                 request.session['userId'] = user.id
-                return redirect(f"/{request.session['type']}/{user.id}")
+                return redirect("/{}/{}".format(request.session['type'], request.session['userId']))
         messages.error(request, "Incorrect username or password.")
         return redirect("/login")
     
