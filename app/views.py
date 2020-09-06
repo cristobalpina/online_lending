@@ -38,7 +38,7 @@ def borrower_profile(request, id):
 
 def lender_profile(request, id):
     lender = Lender.objects.get(id=id)
-    borrowers = Borrower.objects.all()
+    borrowers = Borrower.objects.exclude(loans__lender_id=id)
     context = {
         "lender": lender,
         "borrowers": borrowers
