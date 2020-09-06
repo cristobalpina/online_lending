@@ -32,8 +32,11 @@ class Borrower(models.Model):
 
     @property
     def amount_raised(self):
-        amount = Loan.objects.filter(borrower_id=self.id).values("borrower_id").annotate(total=Sum("amount"))
-        return amount[0]["total"]
+        try:
+            amount = Loan.objects.filter(borrower_id=self.id).values("borrower_id").annotate(total=Sum("amount"))[0]["total"]
+        except:
+            amount = 0
+        return amount
 
     @property
     def creditors(self):
