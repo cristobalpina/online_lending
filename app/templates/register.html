@@ -1,0 +1,214 @@
+<html>
+  <head>
+    <!-- Bootstrap -->
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z"
+      crossorigin="anonymous"
+    />
+    <script
+      src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+      integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
+      integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
+      integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV"
+      crossorigin="anonymous"
+    ></script>
+    <!-- /Bootstrap -->
+  </head>
+  <body>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-6">
+          <h1>Lender</h1>
+          <form action="/create_lender" method="POST">
+            {% csrf_token %}
+            <div class="form-group row">
+              <label for="first_name" class="col-sm-4 col-form-label"
+                >First Name:</label
+              >
+              <div class="col-sm-8">
+                <input
+                  type="text"
+                  class="form-control"
+                  id="first_name"
+                  name="first_name"
+                />
+              </div>
+            </div>
+
+            <div class="form-group row">
+              <label for="last_name" class="col-sm-4 col-form-label"
+                >Last Name:</label
+              >
+              <div class="col-sm-8">
+                <input
+                  type="text"
+                  class="form-control"
+                  id="last_name"
+                  name="last_name"
+                />
+              </div>
+            </div>
+
+            <div class="form-group row">
+              <label for="email" class="col-sm-4 col-form-label">Email:</label>
+              <div class="col-sm-8">
+                <input
+                  type="email"
+                  class="form-control"
+                  id="email"
+                  name="email"
+                />
+              </div>
+            </div>
+
+            <div class="form-group row">
+              <label for="password" class="col-sm-4 col-form-label"
+                >Password:</label
+              >
+              <div class="col-sm-8">
+                <input
+                  type="password"
+                  class="form-control"
+                  id="password"
+                  name="password"
+                />
+              </div>
+            </div>
+
+            <div class="form-group row">
+              <label for="money" class="col-sm-4 col-form-label">Money:</label>
+              <div class="col-sm-8">
+                <input
+                  type="number"
+                  class="form-control"
+                  id="money"
+                  name="money"
+                />
+              </div>
+            </div>
+
+            <a href="/login">Already a member?</a>
+            <button class="btn btn-primary" style="float: right">
+              Register
+            </button>
+          </form>
+        </div>
+        <div class="col-md-6">
+          <h1>Borrower</h1>
+          <form method="POST" action="/create_borrower">
+            {% csrf_token %}
+            <div class="form-group row">
+              <label for="first_name" class="col-sm-4 col-form-label"
+                >First Name:</label
+              >
+              <div class="col-sm-8">
+                <input
+                  type="text"
+                  class="form-control"
+                  id="first_name"
+                  name="first_name"
+                />
+              </div>
+            </div>
+
+            <div class="form-group row">
+              <label for="last_name" class="col-sm-4 col-form-label"
+                >Last Name:</label
+              >
+              <div class="col-sm-8">
+                <input
+                  type="text"
+                  class="form-control"
+                  id="last_name"
+                  name="last_name"
+                />
+              </div>
+            </div>
+
+            <div class="form-group row">
+              <label for="email" class="col-sm-4 col-form-label">Email:</label>
+              <div class="col-sm-8">
+                <input
+                  type="email"
+                  class="form-control"
+                  id="email"
+                  name="email"
+                />
+              </div>
+            </div>
+
+            <div class="form-group row">
+              <label for="password" class="col-sm-4 col-form-label"
+                >Password:</label
+              >
+              <div class="col-sm-8">
+                <input
+                  type="password"
+                  class="form-control"
+                  id="password"
+                  name="password"
+                />
+              </div>
+            </div>
+
+            <div class="form-group row">
+              <label for="need_money_for" class="col-sm-4 col-form-label"
+                >Need Money For:</label
+              >
+              <div class="col-sm-8">
+                <input
+                  type="text"
+                  class="form-control"
+                  id="need_money_for"
+                  name="need_money_for"
+                />
+              </div>
+            </div>
+
+            <div class="form-group row">
+              <label for="description" class="col-sm-4 col-form-label"
+                >Description:</label
+              >
+              <div class="col-sm-8">
+                <textarea
+                  class="form-control"
+                  id="description"
+                  name="description"
+                  rows="3"
+                ></textarea>
+              </div>
+            </div>
+
+            <div class="form-group row">
+              <label for="amount_needed" class="col-sm-4 col-form-label"
+                >Amount Needed:</label
+              >
+              <div class="col-sm-8">
+                <input
+                  type="number"
+                  class="form-control"
+                  id="amount_needed"
+                  name="amount_needed"
+                />
+              </div>
+            </div>
+            <a href="/login">Already a member?</a>
+            <button type="submit" class="btn btn-primary" style="float: right">
+              Register
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
