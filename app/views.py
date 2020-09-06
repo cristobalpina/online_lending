@@ -58,8 +58,12 @@ def lend(request):
 # Auth
 def login(request):
     if request.method == 'GET':
-        if request.session['userId'] == None:
-           return render(request, "login.html")
+        try:
+            if request.session['userId'] == None:
+                return render(request, "login.html")
+        except:
+            return render(request, "login.html")
+
         return redirect("/{}/{}".format(request.session['type'], request.session['userId']))
 
     elif request.method == 'POST':
