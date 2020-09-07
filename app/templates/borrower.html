@@ -28,9 +28,9 @@
     <div class="container">
       <div class="row">
         <div class="col-md-10">
-          <p>Name: <b>{{borrower.first_name}} {{borrower.last_name}}</b></p>
-          <p>Amount Needed: <b>${{borrower.amount_needed}}</b></p>
-          <p>Amount Raised: <b>${{borrower.amount_raised}}</b></p>
+          <p>Name: <b>{{user.first_name}} {{user.last_name}}</b></p>
+          <p>Amount Needed: <b>${{user.profile.borrower.amount_needed}}</b></p>
+          <p>Amount Raised: <b>${{user.profile.borrower.amount_raised}}</b></p>
         </div>
         <div class="col-md-2">
           <a href="/logout">Logout</a>
@@ -48,10 +48,13 @@
               </tr>
             </thead>
             <tbody>
-              {% for creditor in borrower.creditors %}
+              {% for creditor in user.profile.borrower.creditors %}
               <tr>
-                <td>{{creditor.first_name}} {{creditor.last_name}}</td>
-                <td>{{creditor.email}}</td>
+                <td>
+                  {{creditor.profile.user.first_name}}
+                  {{creditor.profile.user.last_name}}
+                </td>
+                <td>{{creditor.profile.user.username}}</td>
                 <td>{{creditor.amount_lent}}</td>
               </tr>
               {% endfor %}

@@ -28,8 +28,10 @@
     <div class="container">
       <div class="row">
         <div class="col-md-10">
-          <p>Name: <b>{{lender.first_name}} {{lender.last_name}}</b></p>
-          <p>Account Balance: <b>${{lender.account_balance}}</b></p>
+          <p>Name: <b>{{user.first_name}} {{user.last_name}}</b></p>
+          <p>
+            Account Balance: <b>${{user.profile.lender.account_balance}}</b>
+          </p>
         </div>
         <div class="col-md-2">
           <a href="/logout">Logout</a>
@@ -52,7 +54,10 @@
             <tbody>
               {% for borrower in borrowers %}
               <tr>
-                <td>{{borrower.first_name}} {{borrower.last_name}}</td>
+                <td>
+                  {{borrower.profile.user.first_name}}
+                  {{borrower.profile.user.last_name}}
+                </td>
                 <td>{{borrower.need_money_for}}</td>
                 <td>{{borrower.description}}</td>
                 <td>{{borrower.amount_needed}}</td>
@@ -90,9 +95,12 @@
               </tr>
             </thead>
             <tbody>
-              {% for debtor in lender.debtors %}
+              {% for debtor in user.profile.lender.debtors %}
               <tr>
-                <td>{{debtor.first_name}} {{debtor.last_name}}</td>
+                <td>
+                  {{debtor.profile.user.first_name}}
+                  {{debtor.profile.user.last_name}}
+                </td>
                 <td>{{debtor.need_money_for}}</td>
                 <td>{{debtor.description}}</td>
                 <td>{{debtor.amount_needed}}</td>

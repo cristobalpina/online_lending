@@ -1,90 +1,88 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import redirect, render, HttpResponse
+from django.contrib.auth.models import User
+from django.contrib.auth import authenticate, login as do_login, logout as do_logout
 from django.contrib import messages
-import bcrypt
-from .models import Lender, Borrower, Loan
+from .models import Lender, Profile, Borrower, Loan
 
 def index(request):
-    return redirect("/login")
+    return redirect('/login')
 
 def register(request):
-    return render(request, "register.html")
+    return render(request, 'register.html')
 
-def create_lender(request):
-    pw_hash = bcrypt.hashpw(request.POST["password"].encode(), bcrypt.gensalt()).decode()
-    Lender.objects.create(first_name=request.POST["first_name"], last_name=request.POST["last_name"], email=request.POST["email"], password=pw_hash, money=request.POST["money"])
-    return redirect("/login")
-
-def create_borrower(request):
-    pw_hash = bcrypt.hashpw(request.POST["password"].encode(), bcrypt.gensalt()).decode()
-    Borrower.objects.create(
-        first_name=request.POST["first_name"],
-        last_name=request.POST["last_name"],
-        email=request.POST["email"],
-        password=pw_hash,
-        need_money_for=request.POST["need_money_for"],
-        description=request.POST["description"],
-        amount_needed=request.POST["amount_needed"],
-    )
-    return redirect("/login")
-
-def borrower_profile(request, id):
-    if id != request.session["userId"]:
-        return redirect("/{}/{}".format(request.session['type'], request.session['userId']))
-    borrower = Borrower.objects.get(id=id)
-    context = {
-        "borrower": borrower,
-    }
-    return render(request, "borrower.html", context)
+def lend(request):
+    lender = request.user.profile.lender
+    borrower = Borrower.objects.get(id=request.POST['borrower_id'])
+    amount = int(request.POST['amount'])
+    
+    if lender.account_balance - amount < 0:
+        messages.error(request, "Insufficient funds")
+        return redirect('/lender/{}'.format(request.user.id))
+    Loan.objects.create(lender=lender, borrower=borrower, amount=amount)
+    return redirect('/lender/{}'.format(request.user.id))
 
 def lender_profile(request, id):
-    lender = Lender.objects.get(id=id)
-    borrowers = Borrower.objects.exclude(loans__lender_id=id)
+    if not request.user.is_authenticated:
+        return redirect('/login')
+    if not request.user.profile.is_lender:
+        user_type = 'lender' if request.user.profile.is_lender else 'borrower'
+        return redirect('/{}/{}'.format(user_type, request.user.id))
     context = {
-        "lender": lender,
-        "borrowers": borrowers
+        "borrowers": Borrower.objects.exclude(loans__lender_id=request.user.profile.lender.id)
     }
     return render(request, "lender.html", context)
 
-def lend(request):
-    borrower = Borrower.objects.get(id=request.POST["borrower_id"])
-    lender = Lender.objects.get(id=request.session["userId"])
-    amount = int(request.POST["amount"])
-    if lender.account_balance - amount < 0:
-        messages.error(request, "Insufficient funds")
-        return redirect("/{}/{}".format(request.session['type'], request.session['userId']))
-    Loan.objects.create(borrower=borrower, lender=lender, amount=amount)
-    return redirect("/{}/{}".format(request.session['type'], request.session['userId']))
+def borrower_profile(request, id):
+    if not request.user.is_authenticated:
+        return redirect('/login')
+    if not request.user.profile.is_borrower:
+        user_type = 'lender' if request.user.profile.is_lender else 'borrower'
+        return redirect('/{}/{}'.format(user_type, request.user.id))
+    
+    return render(request, "borrower.html")
 
-# Auth
+def create_lender(request):
+    user = User.objects.create_user(username=request.POST['email'],
+                                    password=request.POST['password'],
+                                    first_name=request.POST['first_name'],
+                                    last_name=request.POST['last_name'])
+    do_login(request, user)
+    profile = Profile.objects.create(user=user, is_lender=True)
+    lender = Lender.objects.create(profile=profile, money=request.POST['money'])
+    return redirect('/lender/{}'.format(user.id))
+
+def create_borrower(request):
+    user = User.objects.create_user(username=request.POST['email'],
+                                    password=request.POST['password'],
+                                    first_name=request.POST['first_name'],
+                                    last_name=request.POST['last_name'])
+    do_login(request, user)
+    profile = Profile.objects.create(user=user, is_borrower=True)
+    borrower = Borrower.objects.create(
+        profile=profile,
+        need_money_for=request.POST['need_money_for'],
+        description=request.POST['description'],
+        amount_needed=request.POST['amount_needed']
+    )
+    return redirect('/borrower/{}'.format(user.id))
+
 def login(request):
     if request.method == 'GET':
-        try:
-            if request.session['userId'] == None:
-                return render(request, "login.html")
-        except:
-            return render(request, "login.html")
-
-        return redirect("/{}/{}".format(request.session['type'], request.session['userId']))
-
+        if request.user.is_authenticated:
+            user_type = 'lender' if request.user.profile.is_lender else 'borrower'
+            return redirect('/{}/{}'.format(user_type, request.user.id))
+        return render(request, "login.html")
     elif request.method == 'POST':
-        user = None
-        lender = Lender.objects.filter(email=request.POST['email'])
-        if lender:
-            request.session['type'] = 'lender'
-            user = lender[0]
-        else:
-            borrower = Borrower.objects.filter(email=request.POST['email'])
-            if borrower:
-                request.session['type'] = 'borrower'
-                user = borrower[0]
-        if user:
-            if bcrypt.checkpw(request.POST['password'].encode(), user.password.encode()):
-                request.session['userId'] = user.id
-                return redirect("/{}/{}".format(request.session['type'], request.session['userId']))
-        messages.error(request, "Incorrect username or password.")
-        return redirect("/login")
-    
+        user = authenticate(request, username=request.POST['email'], password=request.POST['password'])
+        
+        if user is not None:
+            do_login(request, user)
+            user_type = 'lender' if user.profile.is_lender else 'borrower'
+            return redirect('/{}/{}'.format(user_type, user.id))
+        
+        messages.error(request, 'Invalid credentials')
+        return redirect('/login')
+
 def logout(request):
-    request.session['userId'] = None
-    request.session['type'] = None
-    return redirect("/login")
+    do_logout(request)
+    return redirect('/login')
