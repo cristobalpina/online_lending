@@ -56,10 +56,14 @@ def create_lender(request):
     return redirect('/lender/{}'.format(user.id))
 
 def create_borrower(request):
-    user = User.objects.create_user(username=request.POST['email'],
+    try:
+        user = User.objects.create_user(username=request.POST['email'],
                                     password=request.POST['password'],
                                     first_name=request.POST['first_name'],
                                     last_name=request.POST['last_name'])
+    except:
+        messages.error(request, 'Email already used')
+        return redirect('/register')
     do_login(request, user)
     profile = Profile.objects.create(user=user, is_borrower=True)
     borrower = Borrower.objects.create(
