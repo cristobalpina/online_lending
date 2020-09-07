@@ -50,10 +50,6 @@ def create_lender(request):
     except:
         messages.error(request, 'Email already used')
         return redirect('/register')
-    user = User.objects.create_user(username=request.POST['email'],
-                                    password=request.POST['password'],
-                                    first_name=request.POST['first_name'],
-                                    last_name=request.POST['last_name'])
     do_login(request, user)
     profile = Profile.objects.create(user=user, is_lender=True)
     lender = Lender.objects.create(profile=profile, money=request.POST['money'])
