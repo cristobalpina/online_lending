@@ -27,6 +27,17 @@
   <body>
     <div class="container">
       <div class="row">
+        {% if messages %}
+        <ul class="messages">
+          {% for message in messages %}
+          <li {% if message.tags %} class="{{message.tags}}" {% endif %}>
+            {{message}}
+          </li>
+          {% endfor %}
+        </ul>
+        {% endif %}
+      </div>
+      <div class="row">
         <div class="col-md-6">
           <h1>Lender</h1>
           <form action="/create_lender" method="POST">

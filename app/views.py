@@ -42,6 +42,14 @@ def borrower_profile(request, id):
     return render(request, "borrower.html")
 
 def create_lender(request):
+    try:
+        user = User.objects.create_user(username=request.POST['email'],
+                                    password=request.POST['password'],
+                                    first_name=request.POST['first_name'],
+                                    last_name=request.POST['last_name'])
+    except:
+        messages.error(request, 'Email already used')
+        return redirect('/register')
     user = User.objects.create_user(username=request.POST['email'],
                                     password=request.POST['password'],
                                     first_name=request.POST['first_name'],
