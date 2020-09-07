@@ -79,7 +79,7 @@ def login(request):
         if request.user.is_authenticated:
             user_type = 'lender' if request.user.profile.is_lender else 'borrower'
             return redirect('/{}/{}'.format(user_type, request.user.id))
-        return render(request, "login.html")
+        return render(request, 'login.html')
     elif request.method == 'POST':
         user = authenticate(request, username=request.POST['email'], password=request.POST['password'])
         

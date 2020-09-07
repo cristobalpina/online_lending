@@ -13,7 +13,6 @@ class Lender(models.Model):
     @property
     def account_balance(self):
         try:
-            
             return self.money - Loan.objects.filter(lender_id=self.id).values("lender_id").annotate(total=Sum('amount'))[0]["total"]
         except:
             return self.money
